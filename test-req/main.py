@@ -12,26 +12,29 @@ df_time = pd.DataFrame(columns=["time","req_ok"])
 
 start_time = int(time.time())
 init_time = start_time
+first = True
 while True:
-    while int(time.time())-start_time<120 and start_time!=init_time:
-        pass
-
-    print("- Session start at {}".format(str(start_time)))
+    if first==False:
+        while int(time.time())-start_time<120:
+            time.sleep(1)
+    first = False
     start_time = int(time.time())
+    print("- Session start at {}".format(str(start_time-init_time)))
     req_ok = 0
     for index, row in df.iterrows():
-        row["req_count"] += 1
+        df.loc[index,"req_count"] += 1
         try:
             r = requests.get(row["website_ir"], headers=HEADERS)
             if r.status_code == 200:
-                df["req_ok"] += 1
+                df.loc[index,"req_ok"] += 1
                 req_ok += 1
         except:
             pass
 
-    df_time.loc[len(df_time.index),"time"] = start_time-init_time
-    df_time.loc[len(df_time.index),"req_ok"] = req_ok
-    df["%ok"] = (100/row["req_count"])*df["req_ok"]
+    idx = len(df_time.index)
+    df_time.loc[idx,"time"] = start_time-init_time
+    df_time.loc[idx,"req_ok"] = req_ok
+    df["ok_prc"] = (100/df["req_count"])*df["req_ok"]
 
     df.to_csv("res.csv")
     df_time.to_csv("dist.csv")
