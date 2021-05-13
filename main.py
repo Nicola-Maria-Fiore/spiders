@@ -49,6 +49,8 @@ def findWorks():
         for pro in processes:
             pro.join()
 
+        print("- {} works done!".format(str(today)))
+
 
 
 
@@ -59,7 +61,7 @@ if __name__ == "__main__":
 
     print("Start!")
     schedule.every(5).seconds.do(findWorks)
-    schedule.every().day.at("00:00").do(findWorks)
+    #schedule.every().day.at("00:00").do(findWorks)
 
 
     while True:

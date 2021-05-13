@@ -11,6 +11,8 @@ class Worker:
     def __init__(self, jobs, wid):
         self.jobs = jobs
         self.wid = wid
+        self.history = {}
+        self.history_count = {}
         self.fname = "results/workers_temp/w{}.csv".format(str(wid))
         if os.path.isfile(self.fname):
             self.df = pd.read_csv(self.fname,index_col=False)
@@ -18,11 +20,14 @@ class Worker:
             self.df = pd.DataFrame(columns=["index",'link','main'])
             self.df = self.df.fillna("")
         
+        self.working_rsow = []
         for job in self.jobs:
             index = len(self.df.index)
             self.df.loc[index,"index"] = job[0]
             self.df.loc[index,"link"] = job[1]
             self.df.loc[index,"main"] = ""
+            self.working_rows.append(index)
+
 
 
     #wirks are list of pairs (index,link)
@@ -47,14 +52,26 @@ class Worker:
             else:
                 first = False
 
-            for index, row in self.df.iterrows():
-                content = self.getRequest(row["link"]).replace("\n"," ")
+            upfate = False
+            for index in self.working_rsow:
+                content = self.getRequest(self.df.loc[index,"link"]).replace("\n"," ")
                 if self.df.loc[index,"main"]=="":
                     self.df.loc[index,"main"] = content
+                    self.history[index] = content
+                    self.history_count[index] = 1
+                    upfate = True
+                else:
+                    print("Found change!")
+                    if content!=self.history[index]:
+                        new_page = self.pageDiff(self.history[index], content)
+                        self.history[index] = content
+                        self.df.loc[index,self.history_count[index]] = new_page
+                        self.history_count[index] = self.history_count[index] + 1
+                        upfate = True
 
-            self.df.to_csv(self.fname, quotechar='"', quoting=csv.QUOTE_ALL, encoding='utf-8-sig')
+            if upfate:
+                self.df.to_csv(self.fname, quotechar='"', quoting=csv.QUOTE_ALL, encoding='utf-8-sig', index=False)
 
-        print("DOne")
 
 
     def getRequest(self,url):
@@ -73,3 +90,28 @@ class Worker:
             print(e)
         
         return content
+
+
+    def pageDiff(self,old_page, new_page):
+        old_page = old_page.split()
+        new_page = new_page.split()
+        
+        diff_start = 0
+        for index, val in enumerate(new_page):
+            if index < len(old_page):
+                if val!=old_page[index]:
+                    diff_start = index
+                    break
+            else:
+                break
+
+        diff_end = len(new_page)
+        for i in range(0,len(new_page)):
+            if len(old_page)-i >= 0:
+                if new_page[len(new_page)-i] != old_page[len(old_page)-i]:
+                    diff_end = len(new_page)-i
+                    break 
+            else:
+                break
+
+        return " ".join(new_page[diff_start,diff_end])
