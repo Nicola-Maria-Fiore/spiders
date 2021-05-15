@@ -20,7 +20,7 @@ class Worker:
             self.df = pd.DataFrame(columns=["index",'link','main'])
             self.df = self.df.fillna("")
         
-        self.working_rsow = []
+        self.working_rows = []
         for job in self.jobs:
             index = len(self.df.index)
             self.df.loc[index,"index"] = job[0]
@@ -45,7 +45,7 @@ class Worker:
             
             if first==False:
                 curr_timestamp = int(time.time())    
-                while curr_timestamp-last_timestamp < 120:
+                while curr_timestamp-last_timestamp < 10: #120
                     time.sleep(1)
                     curr_timestamp = int(time.time())
                 last_timestamp = curr_timestamp
@@ -53,19 +53,21 @@ class Worker:
                 first = False
 
             upfate = False
-            for index in self.working_rsow:
+            for index in self.working_rows:
                 content = self.getRequest(self.df.loc[index,"link"]).replace("\n"," ")
                 if self.df.loc[index,"main"]=="":
+                    print("Initializzation")
                     self.df.loc[index,"main"] = content
                     self.history[index] = content
                     self.history_count[index] = 1
                     upfate = True
                 else:
-                    print("Found change!")
-                    if content!=self.history[index]:
+                    print("Second")
+                    if content!=self.history[index]: #!=
+                        print("Found change!")
                         new_page = self.pageDiff(self.history[index], content)
                         self.history[index] = content
-                        self.df.loc[index,self.history_count[index]] = new_page
+                        self.df.loc["Update_"+str(index),self.history_count[index]] = new_page
                         self.history_count[index] = self.history_count[index] + 1
                         upfate = True
 
@@ -106,12 +108,12 @@ class Worker:
                 break
 
         diff_end = len(new_page)
-        for i in range(0,len(new_page)):
-            if len(old_page)-i >= 0:
+        for i in range(1,len(new_page)):
+            if len(old_page)-i >= 0 and len(new_page)-i >= 0:
                 if new_page[len(new_page)-i] != old_page[len(old_page)-i]:
                     diff_end = len(new_page)-i
                     break 
             else:
                 break
 
-        return " ".join(new_page[diff_start,diff_end])
+        return " ".join(new_page[diff_start:diff_end])
