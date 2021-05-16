@@ -57,7 +57,10 @@ class Worker:
                 content = self.getRequest(self.df.loc[index,"link"]).replace("\n"," ")
                 if self.df.loc[index,"main"]=="":
                     print("Initializzation")
-                    self.df.loc[index,"main"] = content
+                    now = datetime.now()
+                    current_time = now.strftime("%H:%M:%S")
+
+                    self.df.loc[index,"main"] = "[{}] {}".format(current_time,content)
                     self.history[index] = content
                     self.history_count[index] = 1
                     upfate = True
@@ -65,9 +68,12 @@ class Worker:
                     print("Second")
                     if content!=self.history[index]: #!=
                         print("Found change!")
+                        now = datetime.now()
+                        current_time = now.strftime("%H:%M:%S")
+
                         new_page = self.pageDiff(self.history[index], content)
+                        self.df.loc["Update_"+str(index),self.history_count[index]] = "[{}] {}".format(current_time,new_page)
                         self.history[index] = content
-                        self.df.loc["Update_"+str(index),self.history_count[index]] = new_page
                         self.history_count[index] = self.history_count[index] + 1
                         upfate = True
 
@@ -104,16 +110,14 @@ class Worker:
                 if val!=old_page[index]:
                     diff_start = index
                     break
-            else:
-                break
+
 
         diff_end = len(new_page)
         for i in range(1,len(new_page)):
             if len(old_page)-i >= 0 and len(new_page)-i >= 0:
                 if new_page[len(new_page)-i] != old_page[len(old_page)-i]:
-                    diff_end = len(new_page)-i
+                    diff_end = len(new_page)
                     break 
-            else:
-                break
+
 
         return " ".join(new_page[diff_start:diff_end])
