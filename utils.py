@@ -47,3 +47,9 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     # Print New Line on Complete
     if iteration == total: 
         print()
+
+
+def saveBinFile(file_name,content): 
+    f = open(file_name, 'wb')
+    f.write(content)
+    f.close()
