@@ -35,7 +35,11 @@ class Worker:
             self.df.loc[index,"index"] = job[0]
             self.df.loc[index,"link"] = job[1]
             self.df.loc[index,"main"] = ""
+            self.df.loc[index,"ea_present"] = 0
             self.working_rows.append(index)
+
+        self.df["index"] = self.df["index"].astype(int)
+        self.df["ea_present"] = self.df["ea_present"].astype(int)
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
         options = webdriver.ChromeOptions()
@@ -43,7 +47,6 @@ class Worker:
         options.add_argument("--incognito")
         options.add_argument('--headless')
         options.add_argument('--disable-gpu')
-        #options.add_argument('--remote-debugging-port=9222')
         self.driver = webdriver.Chrome(executable_path=os.path.join(dir_path, "chromedriver"), chrome_options=options)
         self.driver.set_page_load_timeout(6)
 
@@ -54,6 +57,9 @@ class Worker:
         n_jobs = len(self.jobs)
         print("Worker {} started with {} jobs".format(str(self.wid),str(n_jobs)))
         
+        ea = "earnings announcment"
+        avoid_list = []
+
         last_day = datetime.now().day
         last_timestamp = int(time.time())
         first = True
@@ -62,9 +68,16 @@ class Worker:
             if curr_day != last_day:
                 break
             
+
+            min_wait = 1
             if first==False:
-                curr_timestamp = int(time.time())    
-                while curr_timestamp-last_timestamp < 10: #120
+                curr_timestamp = int(time.time())
+                    
+                time_diff = curr_timestamp-last_timestamp 
+                if time_diff>min_wait:
+                    print("- Late! "+str(time_diff))
+
+                while curr_timestamp-last_timestamp < min_wait: #120 
                     time.sleep(1)
                     curr_timestamp = int(time.time())
                 last_timestamp = curr_timestamp
@@ -75,6 +88,9 @@ class Worker:
 
             update = False
             for index in self.working_rows:
+                if index in avoid_list:
+                    continue
+
                 if self.df.loc[index,"link"]=="#N/A" or self.df.loc[index,"link"]=='':
                     continue
 
@@ -83,25 +99,35 @@ class Worker:
                 if content=='':
                     continue
 
-                content = content.replace("\n"," ")
+                #content = content.replace("\n"," ")
                 if self.df.loc[index,"main"]=="":
-                    now = datetime.now()
-                    current_time = now.strftime("%H:%M:%S")
+                    #now = datetime.now()
+                    #current_time = now.strftime("%H:%M:%S")
 
-                    self.df.loc[index,"main"] = "[{}] {}".format(current_time,content)
-                    self.history[index] = content
-                    self.history_count[index] = 1
+                    if ea in content.lower():
+                        avoid_list.append(index)
+                        self.df.loc[index,"ea_present"] = 1
+
+                    #self.df.loc[index,"main"] = "[{}] {}".format(current_time,content)
+                    #self.history[index] = content
+                    #self.history_count[index] = 1
                     update = True
                 else:
-                    if content!=self.history[index]:
+                    #if content!=self.history[index]:
+                    if ea in content.lower():
                         now = datetime.now()
                         current_time = now.strftime("%H:%M:%S")
+                        self.df.loc[index,"time"] = current_time
+                        self.df.loc[index,"content"] = content
+                        self.df.loc[index,"content_html"] = content_html
+                        avoid_list.append(index)
+
                         #print("- Worker {} : change found at {}".format(str(self.wid),datetime.now().strftime("%H:%M:%S")))
 
-                        new_page = self.pageDiff(self.history[index], content)
-                        self.df.loc[index,"Update_"+str(self.history_count[index])] = "[{}] {}".format(current_time,new_page)
-                        self.history[index] = content
-                        self.history_count[index] = self.history_count[index] + 1
+                        #new_page = self.pageDiff(self.history[index], content)
+                        #self.df.loc[index,"Update_"+str(self.history_count[index])] = "[{}] {}".format(current_time,new_page)
+                        #self.history[index] = content
+                        #self.history_count[index] = self.history_count[index] + 1
 
                         self.findPDF(content_html, "Update_"+str(index), self.history_count[index])
                         update = True
@@ -127,7 +153,8 @@ class Worker:
                 content_html = str(body[0])
                 content = body[0].text
         except Exception as e:
-            print("-- Net error --")
+            #print("-- Net error --")
+            pass
         
         return content, content_html
 
@@ -138,7 +165,7 @@ class Worker:
         content_html = ""
         try:
             self.driver.get(url)
-            html = self.driver.find_element_by_tag_name('body').get_attribute('innerHTML')
+            html = self.driver.find_element_by_tag_name('html').get_attribute('innerHTML')
 
             for _ in range(0,10): 
                 if self.driver.execute_script('return document.readyState;') == 'complete':
@@ -151,7 +178,8 @@ class Worker:
                 content_html = str(body[0])
                 content = body[0].text
         except Exception as e:
-            print("-- Net error --")
+            #print("-- Net error --")
+            pass
         
         return content, content_html
 

@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     if sys.argv[1]=="-monitor":
         schedule.every(5).seconds.do(Monitor.start)
-        #schedule.every().day.at("00:00").do(Monitor.start)
+        schedule.every().day.at("00:00").do(Monitor.start)
 
         while True:
             schedule.run_pending()
