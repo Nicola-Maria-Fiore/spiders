@@ -52,8 +52,6 @@ class Worker:
     def start(self):
         n_jobs = len(self.jobs)
         print("Worker {} started with {} jobs".format(str(self.wid),str(n_jobs)))
-        #if(self.wid==2):
-        #    return
         
         last_day = datetime.now().day
         last_timestamp = int(time.time())
@@ -79,11 +77,10 @@ class Worker:
                 if self.df.loc[index,"link"]=="#N/A" or self.df.loc[index,"link"]=='':
                     continue
 
-                content, content_html = self.getRequestSelenium(self.df.loc[index,"link"])
+                #content, content_html = self.getRequestSelenium(self.df.loc[index,"link"])
+                content, content_html = self.getRequest(self.df.loc[index,"link"])
                 if content=='':
                     continue
-
-                #print(index)
 
                 content = content.replace("\n"," ")
                 if self.df.loc[index,"main"]=="":
@@ -98,7 +95,7 @@ class Worker:
                     if content!=self.history[index]:
                         now = datetime.now()
                         current_time = now.strftime("%H:%M:%S")
-                        print("- Worker {} : change found at {}".format(str(self.wid),datetime.now().strftime("%H:%M:%S")))
+                        #print("- Worker {} : change found at {}".format(str(self.wid),datetime.now().strftime("%H:%M:%S")))
 
                         new_page = self.pageDiff(self.history[index], content)
                         self.df.loc[index,"Update_"+str(self.history_count[index])] = "[{}] {}".format(current_time,new_page)
@@ -141,6 +138,11 @@ class Worker:
         try:
             self.driver.get(url)
             html = self.driver.get_attribute('innerHTML')
+
+            i = 0
+            while self.driver.execute_script('return document.readyState;') != 'complete' and i<10:
+                time.sleep(0.2)
+                i+=1
 
             soup = BeautifulSoup(html,"html.parser")
             body = soup.findAll('body')
