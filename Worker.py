@@ -39,6 +39,7 @@ class Worker:
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
         options = webdriver.ChromeOptions()
+        options.add_argument("--log-level=3")
         options.add_argument("--incognito")
         options.add_argument('--headless')
         options.add_argument('--disable-gpu')
@@ -77,8 +78,8 @@ class Worker:
                 if self.df.loc[index,"link"]=="#N/A" or self.df.loc[index,"link"]=='':
                     continue
 
-                #content, content_html = self.getRequestSelenium(self.df.loc[index,"link"])
-                content, content_html = self.getRequest(self.df.loc[index,"link"])
+                content, content_html = self.getRequestSelenium(self.df.loc[index,"link"])
+                #content, content_html = self.getRequest(self.df.loc[index,"link"])
                 if content=='':
                     continue
 
@@ -137,7 +138,7 @@ class Worker:
         content_html = ""
         try:
             self.driver.get(url)
-            html = self.driver.get_attribute('innerHTML')
+            html = self.driver.find_element_by_tag_name('body').get_attribute('innerHTML')
 
             for _ in range(0,10): 
                 if self.driver.execute_script('return document.readyState;') == 'complete':
