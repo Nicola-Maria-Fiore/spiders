@@ -7,6 +7,12 @@ import time
 import csv
 import os
 
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
+
 class Worker:
     req_headers = headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
     pdf_out = "results/pdf/"
@@ -30,6 +36,15 @@ class Worker:
             self.df.loc[index,"link"] = job[1]
             self.df.loc[index,"main"] = ""
             self.working_rows.append(index)
+
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        options = webdriver.ChromeOptions()
+        options.add_argument("--incognito")
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')
+        #options.add_argument('--remote-debugging-port=9222')
+        self.driver = webdriver.Chrome(executable_path=os.path.join(dir_path, "chromedriver"), chrome_options=options)
+        self.driver.set_page_load_timeout(6)
 
 
 
@@ -64,7 +79,7 @@ class Worker:
                 if self.df.loc[index,"link"]=="#N/A" or self.df.loc[index,"link"]=='':
                     continue
 
-                content, content_html = self.getRequest(self.df.loc[index,"link"])
+                content, content_html = self.getRequestSelenium(self.df.loc[index,"link"])
                 if content=='':
                     continue
 
@@ -96,6 +111,8 @@ class Worker:
             if update:
                 self.df.to_csv(self.fname, quotechar='"', quoting=csv.QUOTE_ALL, encoding='utf-8-sig', index=False)
 
+        self.driver.quit()
+
 
 
     def getRequest(self,url):
@@ -106,6 +123,25 @@ class Worker:
         try:
             response = session.get(url, timeout=6)
             html = response.text
+            soup = BeautifulSoup(html,"html.parser")
+            body = soup.findAll('body')
+            if len(body)>0:
+                content_html = str(body[0])
+                content = body[0].text
+        except Exception as e:
+            print("-- Net error --")
+        
+        return content, content_html
+
+
+
+    def getRequestSelenium(self,url):
+        content = ""
+        content_html = ""
+        try:
+            self.driver.get(url)
+            html = self.driver.get_attribute('innerHTML')
+
             soup = BeautifulSoup(html,"html.parser")
             body = soup.findAll('body')
             if len(body)>0:
