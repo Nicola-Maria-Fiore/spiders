@@ -139,10 +139,10 @@ class Worker:
             self.driver.get(url)
             html = self.driver.get_attribute('innerHTML')
 
-            i = 0
-            while self.driver.execute_script('return document.readyState;') != 'complete' and i<10:
+            for _ in range(0,10): 
+                if self.driver.execute_script('return document.readyState;') == 'complete':
+                    break
                 time.sleep(0.2)
-                i+=1
 
             soup = BeautifulSoup(html,"html.parser")
             body = soup.findAll('body')
