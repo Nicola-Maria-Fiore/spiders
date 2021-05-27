@@ -49,6 +49,7 @@ class Worker:
         options.add_argument('--disable-gpu')
         self.driver = webdriver.Chrome(executable_path=os.path.join(dir_path, "chromedriver"), chrome_options=options)
         self.driver.set_page_load_timeout(6)
+        self.ea = ["earnings announcment", "earnings release", "quarterly report", "earnings press release"]
 
 
 
@@ -57,7 +58,6 @@ class Worker:
         n_jobs = len(self.jobs)
         print("Worker {} started with {} jobs".format(str(self.wid),str(n_jobs)))
         
-        ea = "earnings announcment"
         avoid_list = []
 
         last_day = datetime.now().day
@@ -104,7 +104,7 @@ class Worker:
                     #now = datetime.now()
                     #current_time = now.strftime("%H:%M:%S")
 
-                    if ea in content.lower():
+                    if self.includeEA(content.lower()):
                         avoid_list.append(index)
                         self.df.loc[index,"ea_present"] = 1
 
@@ -114,7 +114,7 @@ class Worker:
                     update = True
                 else:
                     #if content!=self.history[index]:
-                    if ea in content.lower():
+                    if self.includeEA(content.lower()):
                         now = datetime.now()
                         current_time = now.strftime("%H:%M:%S")
                         self.df.loc[index,"time"] = current_time
@@ -225,4 +225,9 @@ class Worker:
                     pass
 
 
+    def includeEA(self, text):
+        for el in self.ea:
+            if el in text:
+                return True
+        return False
                 
