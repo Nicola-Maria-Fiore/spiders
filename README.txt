@@ -1,11 +1,10 @@
-*VIRTUAL ENVIRONMENT
+*INSTALL REQUIREMENTS
 python -m venv venv
+venv/Scripts/activate
+pip install -r requirements.txt
 
 *PRELIMINARY
 venv/Scripts/activate
-
-*INSTALL REQUIREMENTS
-pip install -r requirements.txt
 
 
 --------------------------------------------------------------------------------------------
