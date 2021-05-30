@@ -6,11 +6,9 @@ import multiprocessing
 import pandas as pd
 import math
 
-
 def job(websites, wid):
-    worker = Worker(websites,wid)
+    worker = Worker(websites, wid)
     worker.start()
-
 
 def start():
     input_csv = "resources/input.csv"
@@ -20,7 +18,7 @@ def start():
     works = [] 
     for index, row in df.iterrows():
         if row["date"]!="":
-            date_obj = datetime.strptime(row["date"], '%Y/%m/%d').date()
+            date_obj = datetime.strptime(row["date"], '%Y-%m-%d').date()
             if today==date_obj:
                 works.append((index,row["website_ir"]))
     n_works = len(works)
