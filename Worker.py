@@ -26,7 +26,7 @@ class Worker:
         if os.path.isfile(self.fname):
             self.df = pd.read_csv(self.fname,index_col=False)
         else:
-            self.df = pd.DataFrame(columns=["index",'link','main'])
+            self.df = pd.DataFrame(columns=["index",'link'])
             self.df = self.df.fillna("")
         
         self.working_rows = []
@@ -34,10 +34,10 @@ class Worker:
             index = len(self.df.index)
             self.df.loc[index,"index"] = job[0]
             self.df.loc[index,"link"] = job[1]
+            self.history_count[index] = 1
             self.working_rows.append(index)
 
         self.df["index"] = self.df["index"].astype(int)
-        self.df["ea_present"] = self.df["ea_present"].astype(int)
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
         options = webdriver.ChromeOptions()
@@ -93,7 +93,7 @@ class Worker:
 
                 now = datetime.now()
                 current_time = now.strftime("%H:%M:%S")
-                text = "[{}] {}".format(current_time, content_html)
+                text = "[{}] {}".format(current_time, content_html.replace('\n'," "))
                 self.df.loc[index,"Update_"+str(self.history_count[index])] = text
                 self.history_count[index] = self.history_count[index] + 1
 
