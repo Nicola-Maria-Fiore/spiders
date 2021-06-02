@@ -6,11 +6,11 @@ import multiprocessing
 import pandas as pd
 import math
 
-def job(websites, wid):
-    worker = Worker(websites, wid)
+def job(websites, wid, mins):
+    worker = Worker(websites, wid, mins)
     worker.start()
 
-def start():
+def start(mins):
     input_csv = "resources/input.csv"
     today = datetime.today().date()
     df = pd.read_csv(input_csv)
@@ -39,7 +39,7 @@ def start():
             sub_works = sub_works[last_idx:i*blocks]
             last_idx = i*blocks
 
-            p = Process(target=job, args=(sub_works,i))
+            p = Process(target=job, args=(sub_works,i,mins))
             processes.append(p)
             p.start()
 

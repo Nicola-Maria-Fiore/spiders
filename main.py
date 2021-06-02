@@ -10,9 +10,10 @@ if __name__ == "__main__":
         print("error - at least 3 cores are required")
         sys.exit()
     print("start")
-    if sys.argv[1]=="-monitor":
-        schedule.every(5).seconds.do(Monitor.start)
-        schedule.every().day.at("00:00").do(Monitor.start)
+    if len(sys.argv)>2 and sys.argv[1]=="-monitor":
+        monitor_taks = lambda : Monitor.start(int(sys.argv[2]))
+        schedule.every(5).seconds.do(monitor_taks)
+        schedule.every().day.at("00:00").do(monitor_taks)
         while True:
             schedule.run_pending()
             time.sleep(1)
