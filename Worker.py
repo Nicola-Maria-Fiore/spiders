@@ -16,28 +16,14 @@ from selenium.common.exceptions import NoSuchElementException
 class Worker:
     req_headers = headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
 
-    def __init__(self, jobs, wid, mins):
+    def __init__(self, jobs, wid, mins, out_dir):
         self.min_wait = mins
         self.jobs = jobs
         self.wid = wid
         self.history = {}
         self.history_count = {}
         self.fname = "results/workers_temp/w{}.csv".format(str(wid))
-        if os.path.isfile(self.fname):
-            self.df = pd.read_csv(self.fname,index_col=False)
-        else:
-            self.df = pd.DataFrame(columns=["index",'link'])
-            self.df = self.df.fillna("")
-        
-        self.working_rows = []
-        for job in self.jobs:
-            index = len(self.df.index)
-            self.df.loc[index,"index"] = job[0]
-            self.df.loc[index,"link"] = job[1]
-            self.history_count[index] = 1
-            self.working_rows.append(index)
-
-        self.df["index"] = self.df["index"].astype(int)
+        self.out_dir = out_dir
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
         options = webdriver.ChromeOptions()
@@ -81,46 +67,22 @@ class Worker:
 
             print("- Worker {} : new check at {}".format(str(self.wid),datetime.now().strftime("%H:%M:%S")))
 
-            for index in self.working_rows:
+            for isin, link in self.jobs:
 
-                if self.df.loc[index,"link"]=="#N/A" or self.df.loc[index,"link"]=='':
+                if link in ["#N/A", '']:
                     continue
 
-                content, content_html = self.getRequestSelenium(self.df.loc[index,"link"])
-                #content, content_html = self.getRequest(self.df.loc[index,"link"])
+                content, content_html = self.getRequestSelenium(link)
                 if content=='':
                     continue
 
                 now = datetime.now()
                 current_time = now.strftime("%H:%M:%S")
-                text = "[{}] {}".format(current_time, content_html.replace('\n'," "))
-                self.df.loc[index,"Update_"+str(self.history_count[index])] = text
-                self.history_count[index] = self.history_count[index] + 1
+                fname = "{}_{}.html".format(isin,current_time)
+                utils.writeFile(self.out_dir, fname, content_html)
 
-            self.df.to_csv(self.fname, quotechar='"', quoting=csv.QUOTE_ALL, encoding='utf-8-sig', index=False)
 
         self.driver.quit()
-
-
-
-    def getRequest(self,url):
-        content = ""
-        content_html = ""
-        session = Session()
-        session.headers.update(self.req_headers)
-        try:
-            response = session.get(url, timeout=6)
-            html = response.text
-            soup = BeautifulSoup(html,"html.parser")
-            body = soup.findAll('body')
-            if len(body)>0:
-                content_html = str(body[0])
-                content = body[0].text
-        except Exception as e:
-            #print("-- Net error --")
-            pass
-        
-        return content, content_html
 
 
 
