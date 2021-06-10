@@ -31,8 +31,8 @@ class Worker:
         options.add_argument("--incognito")
         options.add_argument('--headless')
         #options.add_argument('--disable-gpu')
-        options.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
-        options.addArguments("--no-sandbox"); // Bypass OS security model
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--no-sandbox");
         self.driver = webdriver.Chrome(executable_path=os.path.join(dir_path, "chromedriver"), chrome_options=options)
         self.driver.set_page_load_timeout(6)
         self.ea = ["earnings announcment", "earnings release", "quarterly report", "earnings press release"]
