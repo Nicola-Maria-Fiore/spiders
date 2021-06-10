@@ -39,7 +39,7 @@ class Worker:
 
 
 
-    #wirks are list of pairs (index,link)
+     #wirks are list of pairs (index,link)
     def start(self):
         n_jobs = len(self.jobs)
         print("Worker {} started with {} jobs".format(str(self.wid),str(n_jobs)))
@@ -79,9 +79,9 @@ class Worker:
                     continue
 
                 now = datetime.now()
-                current_time = now.strftime("%H:%M:%S")
-                fname = "{}_{}.html".format(isin,current_time)
-                utils.writeFile(self.out_dir, fname, content_html)
+                current_time = now.strftime("%H_%M_%S")
+                fname = "results\\{}\\{}_{}.html".format(self.out_dir, isin,current_time)
+                utils.writeFile(fname, content_html)
 
 
         self.driver.quit()
