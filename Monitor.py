@@ -28,7 +28,7 @@ def start(mins):
     if n_works>0:    
         out_dir = str(today)
         if not os.path.exists("results/"+out_dir):
-            os.makedirs(out_dir)
+            os.makedirs("results/"+out_dir)
 
         available_cpus = multiprocessing.cpu_count()
         blocks = int(math.ceil(n_works/available_cpus))
