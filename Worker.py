@@ -80,7 +80,7 @@ class Worker:
 
                 now = datetime.now()
                 current_time = now.strftime("%H_%M_%S")
-                fname = "results\\{}\\{}_{}.html".format(self.out_dir, isin,current_time)
+                fname = "results/{}/{}_{}.html".format(self.out_dir, isin,current_time)
                 utils.writeFile(fname, content_html)
 
 
