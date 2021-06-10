@@ -8,12 +8,12 @@ def readFileLines(name):
         return lines
 
 
-def writeFile(dir,name,content):
+def writeFile(fname,content):
     try:
-        with open(os.path.join(dir,name), 'w', encoding="utf-8") as file_out:
+        with open(str(fname), 'w', encoding="utf-8") as file_out:
             file_out.write(content)
-    except:
-        print("File write faild")
+    except Exception as e:
+        print(e)
 
 
 def readFile(name):
