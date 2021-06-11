@@ -93,18 +93,17 @@ class Worker:
         content_html = ""
         try:
             self.driver.get(url)
-            html = self.driver.find_element_by_tag_name('html').get_attribute('innerHTML')
 
             for _ in range(0,10): 
                 if self.driver.execute_script('return document.readyState;') == 'complete':
                     break
                 time.sleep(0.2)
+            #html = self.driver.find_element_by_tag_name('html').get_attribute('innerHTML')
+            html = self.driver.execute_script("return document.getElementsByTagName('html')[0].innerHTML")
 
             soup = BeautifulSoup(html,"html.parser")
-            body = soup.findAll('body')
-            if len(body)>0:
-                content_html = str(body[0])
-                content = body[0].text
+            content_html = html
+            content = soup.text
         except Exception as e:
             #print("-- Net error --")
             pass
