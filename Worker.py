@@ -94,10 +94,12 @@ class Worker:
         try:
             self.driver.get(url)
 
-            for _ in range(0,10): 
-                if self.driver.execute_script('return document.readyState;') == 'complete':
-                    break
-                time.sleep(0.2)
+            time.sleep(2.5)
+            #for _ in range(0,10): 
+            #   if self.driver.execute_script('return document.readyState;') == 'complete':
+            #        break
+            #    time.sleep(0.2)
+            
             #html = self.driver.find_element_by_tag_name('html').get_attribute('innerHTML')
             html = self.driver.execute_script("return document.getElementsByTagName('html')[0].innerHTML")
 
