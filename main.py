@@ -14,6 +14,7 @@ if __name__ == "__main__":
         monitor_taks = lambda : Monitor.start(int(sys.argv[2]))
         #schedule.every(5).seconds.do(monitor_taks)
         schedule.every().day.at("00:00").do(monitor_taks)
+        Monitor.start(int(sys.argv[2]))
         while True:
             schedule.run_pending()
             time.sleep(1)
