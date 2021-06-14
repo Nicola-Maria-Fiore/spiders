@@ -30,7 +30,7 @@ def start(mins):
         if not os.path.exists("results/"+out_dir):
             os.makedirs("results/"+out_dir)
 
-        available_cpus = multiprocessing.cpu_count()
+        available_cpus = multiprocessing.cpu_count() + int(multiprocessing.cpu_count()/2)
         blocks = int(math.ceil(n_works/available_cpus))
         
         last_idx = 0
