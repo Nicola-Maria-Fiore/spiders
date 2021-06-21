@@ -75,5 +75,4 @@ def start(mins):
                 pro.join()
             print("- {} works done!".format(str(today)))
         else:
-            print("- {} No works!".format(str(today)))
             time.sleep(60)
