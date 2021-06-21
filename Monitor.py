@@ -28,7 +28,7 @@ def zipdir(dir_name):
     shutil.rmtree('results/{}/'.format(dir_name))
 
 def start(mins):
-    today = "we"
+    today = None
     input_csv = "resources/input.csv"
     df = pd.read_csv(input_csv)
     df = df.fillna("")
