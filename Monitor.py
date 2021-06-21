@@ -34,7 +34,7 @@ def start(mins):
     df = df.fillna("")
     
     while True:
-        if today is not None:
+        if today is not None and os.path.isfile('results/{}.zip'.format(str(today)))==False:
             p = Process(target=zipdir, args=(str(today), ) )
             p.start()
 
