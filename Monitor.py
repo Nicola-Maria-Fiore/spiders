@@ -34,10 +34,6 @@ def start(mins):
     df = df.fillna("")
     
     while True:
-        if today is not None and os.path.isfile('results/{}.zip'.format(str(today)))==False:
-            p = Process(target=zipdir, args=(str(today), ) )
-            p.start()
-
         today = datetime.today().date()
         works = [] 
         for _, row in df.iterrows():
@@ -73,6 +69,9 @@ def start(mins):
 
             for pro in processes:
                 pro.join()
+
+            zip_proc = Process(target=zipdir, args=(str(out_dir), ) )
+            zip_proc.start()
             print("- {} works done!".format(str(today)))
         else:
             time.sleep(60)
