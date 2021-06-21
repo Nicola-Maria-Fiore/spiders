@@ -76,4 +76,4 @@ def start(mins):
             print("- {} works done!".format(str(today)))
         else:
             print("- {} No works!".format(str(today)))
-            time.sleep(86400)
+            time.sleep(60)
