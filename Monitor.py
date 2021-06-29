@@ -30,19 +30,24 @@ def zipdir(dir_name):
 def start(mins):
     today = None
     input_csv = "resources/input.csv"
-    df = pd.read_csv(input_csv)
-    df = df.fillna("")
     
     while True:
+        df = pd.read_csv(input_csv)
+        df = df.fillna("")
+        
         today = datetime.today().date()
         works = [] 
-        for _, row in df.iterrows():
-            if row["date"]!="":
-                date_obj = datetime.strptime(row["date"], '%Y-%m-%d').date()
-                if today==date_obj:
-                    works.append((row["isin"],row["website_ir"]))
-        n_works = len(works)
+        if os.path.isfile("resources/"+str(today)):
+            df_today = pd.read_csv("resources/{}.csv".format(str(today)))
+            df_today = df.fillna("")
+            for _, row in df.iterrows():
+                symbol = row["Symbol"]
+                dt_temp = df[ df["Symbol"]==symbol ]
+                if len(df_today.index)>0:
+                    link = dt_temp.iloc[0,"website_ir"]
+                    works.append((symbol,link))
 
+        n_works = len(works)
         print("- {} works today {}".format(str(n_works),str(today)))
         if n_works>0:    
             out_dir = str(today)
