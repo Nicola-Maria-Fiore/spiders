@@ -40,7 +40,7 @@ def start(mins):
         if os.path.isfile("resources/{}.csv".format(str(today))):
             df_today = pd.read_csv("resources/{}.csv".format(str(today)))
             df_today = df.fillna("")
-            for _, row in df.iterrows():
+            for _, row in df_today.iterrows():
                 symbol = row["Symbol"]
                 dt_temp = df[ df["Symbol"]==symbol ]
                 if len(df_today.index)>0:
