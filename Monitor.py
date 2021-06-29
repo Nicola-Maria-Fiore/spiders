@@ -44,8 +44,8 @@ def start(mins):
                 symbol = row["Symbol"]
                 dt_temp = df[ df["Symbol"]==symbol ]
                 if len(df_today.index)>0:
-                    link = dt_temp.iloc[0,"website_ir"]
-                    works.append((symbol,link))
+                    link = dt_temp.iloc[0]
+                    works.append((symbol,link["website_ir"]))
 
         n_works = len(works)
         print("- {} works today {}".format(str(n_works),str(today)))
