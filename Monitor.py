@@ -37,7 +37,7 @@ def start(mins):
         
         today = datetime.today().date()
         works = [] 
-        if os.path.isfile("resources/"+str(today)):
+        if os.path.isfile("resources/{}.csv".format(str(today))):
             df_today = pd.read_csv("resources/{}.csv".format(str(today)))
             df_today = df.fillna("")
             for _, row in df.iterrows():
