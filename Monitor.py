@@ -43,7 +43,7 @@ def start(mins):
             for _, row in df_today.iterrows():
                 symbol = row["Symbol"]
                 dt_temp = df[ df["Symbol"]==symbol ]
-                if len(df_today.index)>0:
+                if len(dt_temp.index)>0:
                     link = dt_temp.iloc[0]
                     works.append((symbol,link["website_ir"]))
 
