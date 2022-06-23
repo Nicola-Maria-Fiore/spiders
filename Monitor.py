@@ -78,8 +78,8 @@ def start(mins, available_cpus):
             for pro in processes:
                 pro.join()
 
-            #zip_proc = Process(target=zipdir, args=(str(out_dir), ) )
-            #zip_proc.start()
+            zip_proc = Process(target=zipdir, args=(str(out_dir), ) )
+            zip_proc.start()
             print("- {} works done!".format(str(today)))
         else:
             time.sleep(60)
