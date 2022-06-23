@@ -11,6 +11,6 @@ https://github.com/r-boulland/Corporate-Website-Disclosure
 --------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------
 *MONITOR
-python main.py -monitor
+python main.py -monitor seconds_interval n_workers
 
 

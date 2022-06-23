@@ -2,6 +2,7 @@
 from multiprocessing import Process
 from datetime import datetime
 from Worker import Worker
+from routine import xlsToCsv
 import multiprocessing
 import zipfile
 import shutil
@@ -27,11 +28,13 @@ def zipdir(dir_name):
     zipf.close()
     shutil.rmtree('results/{}/'.format(dir_name))
 
-def start(mins):
+def start(mins, available_cpus):
     today = None
     input_csv = "resources/input.csv"
+    print("Workers available: "+str(available_cpus))
     
     while True:
+        xlsToCsv()
         df = pd.read_csv(input_csv)
         df = df.fillna("")
         
@@ -55,7 +58,6 @@ def start(mins):
             if not os.path.exists("results/"+out_dir):
                 os.makedirs("results/"+out_dir)
 
-            available_cpus = multiprocessing.cpu_count() + int(multiprocessing.cpu_count()/2)
             blocks = int(math.ceil(n_works/available_cpus))
             
             last_idx = 0
@@ -76,8 +78,8 @@ def start(mins):
             for pro in processes:
                 pro.join()
 
-            zip_proc = Process(target=zipdir, args=(str(out_dir), ) )
-            zip_proc.start()
+            #zip_proc = Process(target=zipdir, args=(str(out_dir), ) )
+            #zip_proc.start()
             print("- {} works done!".format(str(today)))
         else:
             time.sleep(60)
