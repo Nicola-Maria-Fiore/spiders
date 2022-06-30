@@ -2,6 +2,7 @@ from requests import Request, Session
 from datetime import datetime
 from bs4 import BeautifulSoup
 import pandas as pd
+import logging
 import utils
 import time
 import csv
@@ -24,6 +25,9 @@ class Worker:
         self.history_count = {}
         self.fname = "results/workers_temp/w{}.csv".format(str(wid))
         self.out_dir = out_dir
+        log_subject = str(wid) + "_" + now.strftime("%H_%M_%S")
+        self.logging.basicConfig(level=logging.DEBUG, filename="logs/log_subject.log", filemode="a+",
+                        format="%(asctime)-15s %(levelname)-8s %(message)s")
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
         options = webdriver.ChromeOptions()
@@ -67,7 +71,9 @@ class Worker:
             else:
                 first = False
 
-            print("- Worker {} : new check at {}".format(str(self.wid),datetime.now().strftime("%H:%M:%S")))
+            msg = "- Worker {} : new check at {}".format(str(self.wid),datetime.now().strftime("%H:%M:%S"))    
+            print(msg)
+            logging.info(msg)
 
             for isin, link in self.jobs:
 
