@@ -62,7 +62,9 @@ class Worker:
                     
                 time_diff = curr_timestamp-last_timestamp 
                 if time_diff>self.min_wait:
-                    print("- Late! "+str(time_diff))
+                    mag_late = "- Late! "+str(time_diff)
+                    print(mag_late)
+                    logging.info(mag_late)
 
                 while curr_timestamp-last_timestamp < self.min_wait: 
                     time.sleep(1)
